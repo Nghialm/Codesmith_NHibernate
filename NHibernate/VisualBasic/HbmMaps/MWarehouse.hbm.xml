@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernate.Generated.BusinessObjects" assembly="NHibernate.Generated">
+	<class name="NHibernate.Generated.BusinessObjects.MWarehouse, NHibernate.Generated" table="M_WareHouse" lazy="true">
+		<id name="Id" column="WareHouseCd">
+			<generator class="assigned" />
+		</id>
+		<property name="WareHouseName" column="WareHouseName" />
+		<property name="DelFlg" column="DelFlg" />
+		<property name="EntryStaffName" column="EntryStaffName" />
+		<property name="EntryDate" column="EntryDate" />
+		<property name="EditStaffName" column="EditStaffName" />
+		<property name="EditDate" column="EditDate" />
+	</class>
+</hibernate-mapping>

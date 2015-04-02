@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernate.Generated.BusinessObjects" assembly="NHibernate.Generated">
+	<class name="NHibernate.Generated.BusinessObjects.MSupplier, NHibernate.Generated" table="M_Supplier" lazy="true">
+		<id name="Id" column="SupplierCd">
+			<generator class="assigned" />
+		</id>
+		<property name="SupplierName" column="SupplierName" />
+		<property name="SupplierAbbreviation" column="SupplierAbbreviation" />
+		<property name="SupplierKana" column="SupplierKana" />
+		<property name="Zipcode" column="Zipcode" />
+		<property name="Addres" column="Address" />
+		<property name="Tel" column="Tel" />
+		<property name="Fax" column="Fax" />
+		<property name="SupplierDept" column="SupplierDept" />
+		<property name="SupplierCP" column="SupplierCP" />
+		<property name="MailAddres" column="MailAddress" />
+		<property name="CloseingDate" column="CloseingDate" />
+		<property name="Note1" column="Note1" />
+		<property name="Note2" column="Note2" />
+		<property name="Note3" column="Note3" />
+		<property name="Segment" column="Segment" />
+		<property name="DelFlg" column="DelFlg" />
+		<property name="EntryStaffName" column="EntryStaffName" />
+		<property name="EntryDate" column="EntryDate" />
+		<property name="EditStaffName" column="EditStaffName" />
+		<property name="EditDate" column="EditDate" />
+	</class>
+</hibernate-mapping>

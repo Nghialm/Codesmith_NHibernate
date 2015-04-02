@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernate.Generated.BusinessObjects" assembly="NHibernate.Generated">
+	<class name="NHibernate.Generated.BusinessObjects.MRate, NHibernate.Generated" table="M_Rate" lazy="true">
+		<composite-id>
+			<key-property name="StartDate" column="StartDate" /> 
+			<key-property name="CurrencyCd" column="CurrencyCd" /> 
+		</composite-id>
+		<property name="TaxRate" column="TaxRates" />
+		<property name="DelFlg" column="DelFlg" />
+		<property name="EntryStaffName" column="EntryStaffName" />
+		<property name="EntryDate" column="EntryDate" />
+		<property name="EditStaffName" column="EditStaffName" />
+		<property name="EditDate" column="EditDate" />
+	</class>
+</hibernate-mapping>

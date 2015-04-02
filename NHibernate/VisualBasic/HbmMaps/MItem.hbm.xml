@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernate.Generated.BusinessObjects" assembly="NHibernate.Generated">
+	<class name="NHibernate.Generated.BusinessObjects.MItem, NHibernate.Generated" table="M_Item" lazy="true">
+		<id name="Id" column="ItemCd">
+			<generator class="assigned" />
+		</id>
+		<property name="ItemName" column="ItemName" />
+		<property name="ItemNumber" column="ItemNumber" />
+		<property name="MakerCd" column="MakerCd" />
+		<property name="PriceInfo" column="PriceInfo" />
+		<property name="OrderInfo" column="OrderInfo" />
+		<property name="ShipInfo" column="ShipInfo" />
+		<property name="Note1" column="Note1" />
+		<property name="Note2" column="Note2" />
+		<property name="Note3" column="Note3" />
+		<property name="LeadTime" column="LeadTime" />
+		<property name="DisFlg" column="DisFlg" />
+		<property name="DelFlg" column="DelFlg" />
+		<property name="EntryStaffName" column="EntryStaffName" />
+		<property name="EntryDate" column="EntryDate" />
+		<property name="EditStaffName" column="EditStaffName" />
+		<property name="EditDate" column="EditDate" />
+	</class>
+</hibernate-mapping>

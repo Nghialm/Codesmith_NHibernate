@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernate.Generated.BusinessObjects" assembly="NHibernate.Generated">
+	<class name="NHibernate.Generated.BusinessObjects.MStaff, NHibernate.Generated" table="M_Staff" lazy="true">
+		<id name="Id" column="StaffCd">
+			<generator class="assigned" />
+		</id>
+		<property name="StaffName" column="StaffName" />
+		<property name="StaffNameKana" column="StaffNameKana" />
+		<property name="UserID" column="UserID" />
+		<property name="Password" column="Password" />
+		<property name="MailAddres" column="MailAddress" />
+		<property name="PostCd" column="PostCd" />
+		<property name="Note1" column="Note1" />
+		<property name="Note2" column="Note2" />
+		<property name="Note3" column="Note3" />
+		<property name="DelFlg" column="DelFlg" />
+		<property name="EntryStaffName" column="EntryStaffName" />
+		<property name="EntryDate" column="EntryDate" />
+		<property name="EditStaffName" column="EditStaffName" />
+		<property name="EditDate" column="EditDate" />
+	</class>
+</hibernate-mapping>

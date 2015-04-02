@@ -1,0 +1,64 @@
+<%-- 
+Name: EditableBusinessObject.cst
+Author: Tom DuPont
+Description: Generates an editable Business Object for NHibernate.
+--%>
+<%@ CodeTemplate Language="C#" Src="..\Helpers\NHibernateHelper.cs" Inherits="NHibernateHelper" TargetLanguage="C#" Debug="False" Description="Generates an editable Business Object for NHibernate." %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Optional="False" Category="1a. Source Table" Description="The source table to generate from." %>
+<%@ Property Name="TablePrefix" Type="System.String" Default="" Optional="True" Category="1b. Database Options" Description="A prefix that will be stripped from table names when class names are generated." %>
+<%@ Property Name="ServiceNamespace" Type="System.String" Default="NHibernate.Generated.BusinessObjects" Optional="False" Category="2. Namespaces" Description="The desired Namespace for the Business Objects." %>
+<%@ Property Name="ModuleNamespace" Type="System.String" Default="NHibernate.Generated.Base" Optional="False" Category="2. Namespaces" Description="The Namespace where the Base classes (BusinessBase & ManagerBase) are located." %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Map Name="SystemCSharp" Src="System-CSharpAlias" %>
+<% this.tablePrefix = TablePrefix; %>
+Imports VBMS.DAO
+Imports VBMS.Entity
+Imports VBMS.DAO.NHibernate
+
+Public Class <%= GetClassName(SourceTable) %>Service
+#Region "Property"
+    Private _<%= GetClassName(SourceTable) %>Dao As I<%= GetClassName(SourceTable) %>Dao = New <%= GetClassName(SourceTable) %>HDao()
+
+    Public Property <%= GetClassName(SourceTable) %>Dao() As I<%= GetClassName(SourceTable) %>Dao
+        Get
+            Return _<%= GetClassName(SourceTable) %>Dao
+        End Get
+        Set(ByVal value As I<%= GetClassName(SourceTable) %>Dao)
+            _<%= GetClassName(SourceTable) %>Dao = value
+        End Set
+    End Property
+#End Region
+	Public Function GetById(ByVal id As Integer) As <%= GetClassName(SourceTable) %>
+        Return _<%= GetClassName(SourceTable) %>Dao.GetById(id)
+    End Function
+
+    Public Function GetAll() As IList(Of <%= GetClassName(SourceTable) %>)
+        Dim lst As IList(Of <%= GetClassName(SourceTable) %>) = _<%= GetClassName(SourceTable) %>Dao.GetAll()
+        Return lst
+    End Function
+
+    Public Function Save(ByVal entity As <%= GetClassName(SourceTable) %>) As <%= GetClassName(SourceTable) %>
+        Return _<%= GetClassName(SourceTable) %>Dao.Save(entity)
+    End Function
+
+    Public Sub Update(ByVal entity As <%= GetClassName(SourceTable) %>)
+        _<%= GetClassName(SourceTable) %>Dao.Update(entity)
+    End Sub
+
+    Public Sub Delete(ByVal entity As <%= GetClassName(SourceTable) %>)
+        _<%= GetClassName(SourceTable) %>Dao.Delete(entity)
+    End Sub
+	
+	Public Function VBMSGetAll() As IList(Of <%= GetClassName(SourceTable) %>)
+        Dim lst As IList(Of <%= GetClassName(SourceTable) %>) = _<%= GetClassName(SourceTable) %>Dao.GetAll()
+        Return lst
+    End Function
+	
+	Public Sub VBMSDelete(ByVal entity As <%= GetClassName(SourceTable) %>)
+		entity.DelFlg = 1
+        _<%= GetClassName(SourceTable) %>Dao.Update(entity)
+    End Sub
+End Class

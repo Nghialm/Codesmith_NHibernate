@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="NHibernate.Generated.BusinessObjects" assembly="NHibernate.Generated">
+	<class name="NHibernate.Generated.BusinessObjects.MInventoryholder, NHibernate.Generated" table="M_InventoryHolder" lazy="true">
+		<composite-id>
+			<key-property name="ItemCd" column="ItemCd" /> 
+			<key-property name="ClosedDate" column="ClosedDate" /> 
+			<key-property name="StaffCd" column="StaffCd" /> 
+		</composite-id>
+		<property name="ArriveNum" column="ArriveNum" />
+		<property name="ArrivePrice" column="ArrivePrice" />
+		<property name="ShippingNum" column="ShippingNum" />
+		<property name="ShippingPrice" column="ShippingPrice" />
+		<property name="StockNum" column="StockNum" />
+		<property name="StockPrice" column="StockPrice" />
+		<property name="DisposalNum" column="DisposalNum" />
+		<property name="DisposalPrice" column="DisposalPrice" />
+		<property name="DelFlg" column="DelFlg" />
+		<property name="EntryStaffName" column="EntryStaffName" />
+		<property name="EntryDate" column="EntryDate" />
+		<property name="EditStaffName" column="EditStaffName" />
+		<property name="EditDate" column="EditDate" />
+	</class>
+</hibernate-mapping>
