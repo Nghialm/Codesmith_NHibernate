@@ -36,6 +36,26 @@ public class NHibernateHelper : CodeTemplate
 	}
 	
 	#region Variable & Class Name Methods
+    public string GetPropertyLeng(ColumnSchema column)
+    {
+        string tmpSize = "";
+        string dbtype = column.DataType.ToString();
+        switch (dbtype)
+        {
+            case "String":
+                tmpSize="length=\"" + column.Size.ToString() + "\"";
+                break;
+            case "Decimal":
+                tmpSize= string.Format("precision=\"{0}\" scale=\"{1}\"", column.Precision , column.Scale);
+                break;
+            default:
+                tmpSize="";
+                break;
+                
+        }
+            
+        return tmpSize;
+    }
 	
 	public string GetPropertyName(TableSchema table, ColumnSchema column)
 	{

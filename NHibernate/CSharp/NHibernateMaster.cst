@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
 Name: NHibernateMaster.cst
 Author: Tom DuPont
 Description: Generates a complete set of Maps, Business Objects, Manager Objects, and a ManagerFactory for NHibernate, the adds them to the specified .csproj file.
@@ -67,7 +67,7 @@ Description: Generates a complete set of Maps, Business Objects, Manager Objects
 <script runat="template">
 public string CustomGetFolder(string SubFolder)
 {
-	string MainFolder = @"F:\CodeGen\Ketoan";
+	string MainFolder = @"E:\CodeGen\Ketoan";
 	return MainFolder + @"\" + SubFolder + @"\";
 	}
 
