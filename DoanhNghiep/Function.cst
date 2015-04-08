@@ -1,0 +1,169 @@
+<%-- 
+Name:
+Author: 
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="Template description here." %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema"
+	Description="Table that the stored procedures should be based on." %>
+<%@ Property Name="ObjectName" Type="String"
+	Description="Table that the stored procedures should be based on." %>	
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%-- Assembly References --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Assembly Name="System.Data" %>
+<%-- Namespace Imports --%>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
+<%@ Import Namespace="System.Data" %>
+private void ShowData()
+{
+	<% GenerateColumns1(); %>
+}
+
+private boolean SaveData()
+{
+	<% GenerateColumns2(); %>
+}
+
+private void ResetForm()
+{
+
+}
+<script runat="template">
+// My methods here.
+
+public void GenerateColumns1()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	//ColumnSchemaCollection filteredColumns = FilterExcludedColumns(columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		switch( GeneColumns[i].DataType )
+		{
+			case DbType.AnsiString:
+				Response.WriteLine("\ttxt " + ReName(GeneColumns[i].Name) + ".Text = " + "" + ObjectName + "." + ReName(GeneColumns[i].Name) + ";");
+				break;
+			case DbType.AnsiStringFixedLength:
+				Response.WriteLine("\ttxt " + ReName(GeneColumns[i].Name) + ".Text = " + "" + ObjectName + "." + ReName(GeneColumns[i].Name) + ";");
+				break;
+			case DbType.String:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "" + ObjectName + "." + ReName(GeneColumns[i].Name) + ";");
+				break;
+			case DbType.DateTime:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "" + ObjectName + "." + ReName(GeneColumns[i].Name) + ".ToString(\"dd/MM/yyyy\");");
+				break;
+			case DbType.Date:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "" + ObjectName + "." + ReName(GeneColumns[i].Name) + ".ToString(\"dd/MM/yyyy\");");
+				break;
+			default:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "" + ObjectName + "." + ReName(GeneColumns[i].Name) + ".ToString();");
+				break;
+			}
+	}
+}
+
+public void GenerateColumns2()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	//ColumnSchemaCollection filteredColumns = FilterExcludedColumns(columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		switch( GeneColumns[i].DataType )
+		{
+			case DbType.AnsiString:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine("txt" + ReName(GeneColumns[i].Name) + ".Text;");
+				break;
+			case DbType.AnsiStringFixedLength:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine("txt" + ReName(GeneColumns[i].Name) + ".Text;");
+				break;
+			case DbType.String:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine("txt" + ReName(GeneColumns[i].Name) + ".Text;");
+				break;
+			case DbType.StringFixedLength:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine("txt" + ReName(GeneColumns[i].Name) + ".Text;");
+				break;
+			case DbType.DateTime:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine("txt" + ReName(GeneColumns[i].Name) + ".Text;");
+				break;
+			case DbType.Date:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine("txt" + ReName(GeneColumns[i].Name) + ".Text;");
+				break;
+			default:
+				Response.Write("obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name));
+				Response.Write(" = ");
+				Response.WriteLine(GeneColumns[i].DataType + ".Parse(txt" + ReName(GeneColumns[i].Name) + ".Text);");
+				break;
+			}
+		}
+	}
+	
+public void GenerateColumns3()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	//ColumnSchemaCollection filteredColumns = FilterExcludedColumns(columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		switch( GeneColumns[i].DataType )
+		{
+			case DbType.AnsiString:
+				Response.WriteLine("\ttxt " + ReName(GeneColumns[i].Name) + ".Text = ;");
+				break;
+			case DbType.AnsiStringFixedLength:
+				Response.WriteLine("\ttxt " + ReName(GeneColumns[i].Name) + ".Text = " + "obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name) + ";");
+				break;
+			case DbType.String:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name) + ";");
+				break;
+			case DbType.DateTime:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name) + ".ToString(\"dd/MM/yyyy\");");
+				break;
+			case DbType.Date:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name) + ".ToString(\"dd/MM/yyyy\");");
+				break;
+			default:
+				Response.WriteLine("\ttxt" + ReName(GeneColumns[i].Name) + ".Text = " + "obj" + Table(SourceTable.Name) + "." + ReName(GeneColumns[i].Name) + ".ToString();");
+				break;
+			}
+	}
+}	
+public string Table(string tempString)
+{
+	tempString.Replace("_","");
+	//return tempString.Replace("T","");
+	return "obj";
+	//tempString.Replace('T','');
+	//return tempString.Replace('_', '');
+	}
+
+public string ReName(string tempString)
+{
+	string[] nString;
+	string returnstring = "";
+	nString = tempString.Split('_');
+	foreach( string tstr in nString)
+	{
+		returnstring += tstr.Substring(0,1);
+		returnstring += tstr.Substring(1).ToLower();
+		}
+		return returnstring;
+	}
+</script>

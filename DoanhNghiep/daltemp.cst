@@ -1,0 +1,655 @@
+<%-- 
+Name: Nghialm
+Author: 
+Description: 
+--%>
+<%-- Context --%>
+<%@ CodeTemplate Language="C#" TargetLanguage="HTML" Src="Function.cs" Inherits="Function" Description="Generates a set of HTML-based database documentation." %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema"
+	Description="Table that the stored procedures should be based on." %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%-- Assembly References --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Assembly Name="System.Data" %>
+<%-- Namespace Imports --%>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+
+using DoanhNghiepEntities<%=GenNameSpace(SourceTable.Name)%>;
+
+namespace DoanhNghiepDAL_Base<%=GenNameSpace(SourceTable.Name)%> 
+{
+    public class DAL_<%= ReturnObjectClass() %>_Base : DAL_base
+	{
+		#region Basic function
+		
+		/// <summary>
+        /// Load Reader to Object
+        /// </summary>
+        /// <param name="rdr"></param>
+        /// <returns></returns>
+		protected <%=ReturnObjectName() %> ReaderToObject(SqlDataReader rdr)
+		{
+			int idx = 0;
+            <%=ReturnObjectName() %> result = null;
+            if (rdr.Read())
+			{
+				result = new <%=ReturnObjectName() %>();
+                <%--result.<%=SourceTable.PrimaryKey.MemberColumns[0].Name %> = _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>; --%>
+                <% GenFindSingle(); %>
+			}
+			return result;
+		}
+		
+        /// <summary>
+        /// Select all record
+        /// </summary>
+        /// <returns></returns>
+        public DataTable SelectAll(TNTCommon.DBManager objdbmanager)
+        {
+            SqlDataReader rdr = null;
+            DataTable dt = new DataTable();
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_SelectAll", objdbmanager.Sqlconnection);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                // execute the command
+                rdr = cmd.ExecuteReader();
+
+                if (rdr.HasRows)
+                {
+                    dt.Load(rdr);
+                }
+            }
+            finally
+            {
+				if (rdr != null)
+                {
+                    rdr.Close();
+					//objdbmanager.Close();
+                }
+            }
+            return dt;
+		}
+
+		/// <summary>
+        /// Delete record by <%=SourceTable.PrimaryKey.MemberColumns[0].Name %>
+        /// </summary>
+        /// <param name="_<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>"></param>
+        /// <returns></returns>
+        public Boolean Delete(<%=ConvertDBType2CSType(SourceTable.PrimaryKey.MemberColumns[0].Column) %> _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>, TNTCommon.DBManager objdbmanager)
+        {
+			Boolean bstatus = true;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_Delete", objdbmanager.Sqlconnection, objdbmanager.Sqltransaction);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>", _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>));
+
+                // execute the command
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+				//objdbmanager.Close();
+            }
+			return bstatus;
+        }
+		
+		/// <summary>
+        /// Select record by <%=SourceTable.PrimaryKey.MemberColumns[0].Name %>
+        /// </summary>
+        /// <param name="_<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>"></param>
+        /// <returns></returns>
+        public <%=ReturnObjectName() %> Select(<%ReturnType1(SourceTable.PrimaryKey.MemberColumns[0].Column);%> _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>, TNTCommon.DBManager objdbmanager)
+        {
+            SqlDataReader rdr = null;
+            <%=ReturnObjectName() %> result = null;
+            int idx = 0;
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_Select", objdbmanager.Sqlconnection);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>", _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>));
+
+                // execute the command
+                rdr = cmd.ExecuteReader();
+
+                result = ReaderToObject(rdr);
+            }
+            finally
+            {
+				if (rdr != null)
+                {
+                    rdr.Close();
+					//objdbmanager.Close();
+                }
+            }
+            return result;
+        }
+		
+		/// <summary>
+        /// Insert one record
+        /// </summary>
+        /// <param name="objRecord"></param>
+        public Boolean Insert(<%=ReturnObjectName() %> objRecord, TNTCommon.DBManager objdbmanager)
+        {
+			Boolean bStatus = true;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name%>_Insert", objdbmanager.Sqlconnection, objdbmanager.Sqltransaction);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                <% genInsertParameter(); %>
+
+                // execute the command
+                cmd.ExecuteNonQuery();
+				
+				<% GenPrimaryKey(); %>
+            }
+            finally
+            {
+				//objdbmanager.Close();
+            }
+			return bStatus;
+        }
+		
+		/// <summary>
+        /// Update Data
+        /// </summary>
+        /// <param name="objRecord"></param>
+        public Boolean Update(<%=ReturnObjectName()%> objRecord, TNTCommon.DBManager objdbmanager)
+        {
+			Boolean bStatus = true;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_Update", objdbmanager.Sqlconnection, objdbmanager.Sqltransaction);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                <% genParameter();%>
+
+                // execute the command
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+				//objdbmanager.Close();
+            }
+			return bStatus;
+        }
+		
+		<% if (CheckDONVIID()) {%>
+		///<summary>
+        ///Select All
+        ///</summary>
+        ///<param name="_bqlda_id"></param>
+        ///<returns></returns>
+        public DataTable SelectAllByDonvi_id(TNTCommon.DBManager objdbmanager, Guid _donvi_id)
+        {
+            SqlDataReader rdr = null;
+            DataTable dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_ByDONVIID", objdbmanager.Sqlconnection);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@donvi_id", _donvi_id));
+                // execute the command
+                rdr = cmd.ExecuteReader();
+                if (rdr.HasRows)
+                { dt.Load(rdr); }
+            }
+            finally
+            {
+                if (rdr != null) { rdr.Close(); }
+            }
+            return dt;
+        }
+		
+		///<summary>
+        ///Select All
+        ///</summary>
+        ///<param name="_bqlda_id"></param>
+        ///<returns></returns>
+        public List<<%=ReturnObjectName()%>> SelectByDonvi_id(TNTCommon.DBManager objdbmanager, Guid _donvi_id)
+        {
+            SqlDataReader rdr = null;
+            List<<%=ReturnObjectName()%>> listObj = new List<<%=ReturnObjectName()%>>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_ByDONVIID", objdbmanager.Sqlconnection);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@donvi_id", _donvi_id));
+                // execute the command
+                rdr = cmd.ExecuteReader();
+
+                Boolean continuesLoop = true;
+                if (rdr.HasRows)
+                    do
+                    {
+                        <%=ReturnObjectName()%> _temp = this.ReaderToObject(rdr);
+                        if (_temp == null) continuesLoop = false;
+                        else
+                        {
+                            listObj.Add(_temp);
+                            continuesLoop = true;
+                        }
+                    }
+                    while (continuesLoop);
+            }
+            finally
+            {
+                if (rdr != null) { rdr.Close(); }
+            }
+            return listObj;
+        }
+		<% }%>
+		
+		<% if (CheckCTD_ID()) {%>
+		///<summary>
+        ///Select All
+        ///</summary>
+        ///<param name="_ctd_id"></param>
+        ///<returns></returns>
+        public DataTable SelectAllByCTD_ID(TNTCommon.DBManager objdbmanager, Guid _ctd_id)
+        {
+            SqlDataReader rdr = null;
+            DataTable dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_ByCTD_ID", objdbmanager.Sqlconnection);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@ctd_id", _ctd_id));
+                // execute the command
+                rdr = cmd.ExecuteReader();
+                if (rdr.HasRows)
+                { dt.Load(rdr); }
+            }
+            finally
+            {
+                if (rdr != null) { rdr.Close(); }
+            }
+            return dt;
+        }
+
+        ///<summary>
+        ///Select SelectByCTD_ID
+        ///</summary>
+        ///<param name="_ctd_id"></param>
+        ///<returns></returns>
+        public List<<%=ReturnObjectName()%>> SelectByCTD_ID(TNTCommon.DBManager objdbmanager, Guid _ctd_id)
+        {
+            SqlDataReader rdr = null;
+            List<<%=ReturnObjectName()%>> listObject = new List<<%=ReturnObjectName()%>>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_ByCTD_ID", objdbmanager.Sqlconnection);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@ctd_id", _ctd_id));
+                // execute the command
+                rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    <%=ReturnObjectName()%> _temp = this.ReaderToObject(rdr);
+                    listObject.Add(_temp);
+                }
+            }
+            finally
+            {
+                if (rdr != null) { rdr.Close(); }
+            }
+            return listObject;
+        }
+		
+		public Boolean DeleteByCTD_ID(TNTCommon.DBManager objdbmanager, Guid _ctd_id)
+		{
+			Boolean bstatus = true;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("<%=SourceTable.Name %>_DeleteByCTD_ID", objdbmanager.Sqlconnection, objdbmanager.Sqltransaction);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.Add(new SqlParameter("@ctd_id", _ctd_id));
+
+                // execute the command
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+				//objdbmanager.Close();
+            }
+			return bstatus;
+		}
+		<% }%>
+		#endregion
+	}
+}
+<script runat="template">
+
+public void GenFindSingle()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		//if (!GeneColumns[i].IsPrimaryKeyMember)
+		//{
+		Response.WriteLine("\t\t\t\t\tidx = rdr.GetOrdinal(\"" + GeneColumns[i].Name + "\");");
+		Response.WriteLine("\t\t\t\t\tif (rdr[idx] != DBNull.Value)");
+		Response.WriteLine("\t\t\t\t\t{");
+		Response.WriteLine("\t\t\t\t\t\tresult."+GeneColumns[i].Name+" = rdr." + ReturnType(GeneColumns[i]) + "(idx);");
+		Response.WriteLine("\t\t\t\t\t}");
+		//}
+		
+	}
+}
+
+public void genInsertParameter()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		if (GeneColumns[i].IsPrimaryKeyMember)
+		{
+			if (GeneColumns[i].DataType == DbType.Int32)
+			{
+				Response.Write("\t\t\t\tcmd.Parameters.Add(new SqlParameter");
+				Response.Write("(\"@" + GeneColumns[i].Name + "\",");
+				/*string s = "";
+				switch (GeneColumns[i].DataType)
+				{
+				case DbType.Int16:
+					s = "SqlDbType.Int16";
+				case DbType.Int32:
+				case DbType.Int64:
+				}*/
+				Response.Write(" SqlDbType.Int, 4, ");
+				Response.Write("ParameterDirection.Output,true,4,0,\"" + GeneColumns[i].Name + "\",DataRowVersion.Default, null));\n");
+				}
+			else
+			{
+				if (GeneColumns[i].DataType == DbType.Guid)
+				{
+					Response.Write("\t\t\t\tcmd.Parameters.Add(new SqlParameter");
+					Response.Write("(\"@" + GeneColumns[i].Name + "\",");
+					/*string s = "";
+					switch (GeneColumns[i].DataType)
+					{
+					case DbType.Int16:
+						s = "SqlDbType.Int16";
+					case DbType.Int32:
+					case DbType.Int64:
+					}*/
+					Response.Write(" SqlDbType.UniqueIdentifier, 16, ");
+					Response.Write("ParameterDirection.Output,true,16,0,\"" + GeneColumns[i].Name + "\",DataRowVersion.Default, null));\n");
+				}
+				else
+				{
+					Response.Write("\t\t\t\tcmd.Parameters.Add(new SqlParameter");
+					Response.Write("(\"@" + GeneColumns[i].Name + "\", objRecord." + GeneColumns[i].Name + "));\n");
+					}
+				}
+			}
+		else
+		{
+			if ((GeneColumns[i].AllowDBNull && GeneColumns[i].DataType == DbType.DateTime))
+				Response.Write("\t\t\t\tif (objRecord." + GeneColumns[i].Name + " != DateTime.MinValue) ");
+			else
+				Response.Write("\t\t\t");
+			Response.Write("cmd.Parameters.Add(new SqlParameter");
+			Response.Write("(\"@" + GeneColumns[i].Name + "\", objRecord." + GeneColumns[i].Name + "));\n");
+			}
+	}
+}
+
+public void genParameter()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		if (GeneColumns[i].AllowDBNull && GeneColumns[i].DataType == DbType.DateTime)
+			Response.Write("\t\t\t\tif (objRecord." + GeneColumns[i].Name + " >= TNTCommon.DefaultValue.MinDateTime())\n");
+		Response.Write("\t\t\t\tcmd.Parameters.Add(new SqlParameter");
+		Response.Write("(\"@" + GeneColumns[i].Name + "\", objRecord." + GeneColumns[i].Name + "));\n");
+	}
+}
+
+public string ReturnObjectClass()
+{
+	string stable = SourceTable.Name.ToString();
+	return stable;
+	}
+
+public string ReturnObjectName()
+{
+	string stable = SourceTable.Name.ToString();
+	return stable + "Info";
+	}
+	
+public string ReturnType(ColumnSchema tempCol)
+{
+	switch (tempCol.DataType)
+	{
+		case DbType.Guid:
+			return "GetGuid";
+		case DbType.DateTime:
+			return "GetDateTime";
+		case DbType.Int16:
+			return "GetInt16";
+		case DbType.Int32:
+			return "GetInt32";
+		case DbType.Int64:
+			return "GetInt64";
+		case DbType.Boolean:
+			return "GetBoolean";
+		case DbType.Decimal:
+			return "GetDecimal";
+		default:
+			return "GetString";
+		}
+	}
+	
+public void ReturnType1(ColumnSchema tempCol1)
+{
+	string s = "";
+	switch (tempCol1.DataType)
+	{
+		case DbType.Guid:
+			s = "Guid";
+			break;
+		case DbType.Int16:
+			s = "Int16";			
+			break;
+		case DbType.Int32:
+			s = "Int32";
+			break;
+		case DbType.Int64:
+			s = "Int64";
+			break;
+		default:
+			s = "String";
+			break;
+		}
+		Response.Write(s);
+	}	
+	
+public void GenPrimaryKey()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		if (GeneColumns[i].IsPrimaryKeyMember)
+		{
+			if (GeneColumns[i].DataType == DbType.Int32)
+			{
+				Response.Write("\t\t\t\tobjRecord." + SourceTable.PrimaryKey.MemberColumns[0].Column.Name + " = Int32.Parse(cmd.Parameters[0].SqlValue.ToString());\n");
+				}
+			if (GeneColumns[i].DataType == DbType.Int64)
+			{
+				Response.Write("\t\t\t\tobjRecord." + SourceTable.PrimaryKey.MemberColumns[0].Column.Name + " = Int64.Parse(cmd.Parameters[0].SqlValue.ToString());\n");
+				}
+			if (GeneColumns[i].DataType == DbType.Guid)
+			{
+				Response.Write("\t\t\t\tobjRecord." + SourceTable.PrimaryKey.MemberColumns[0].Column.Name + " = new Guid(cmd.Parameters[0].SqlValue.ToString());\n");
+				}	
+			}
+		}	
+	}
+	
+public bool CheckDONVIID()
+{
+	string s = "donvi_id";
+	bool b = false;
+	foreach(ColumnSchema objCol in SourceTable.Columns)
+	{
+		if (objCol.Name.ToLower() == s.ToLower() && !objCol.IsPrimaryKeyMember) return true;
+		}
+		return false;
+	}
+	
+public void GenSelectAllWithDONVIID()	
+	{
+		if (!CheckDONVIID()) return;
+		Response.WriteLine("\t\t///<summary>");
+		Response.WriteLine("\t\t///Select All");
+		Response.WriteLine("\t\t///</summary>");
+		Response.WriteLine("\t\t///<param name=\"_bqlda_id\"></param>");
+		Response.WriteLine("\t\t///<returns></returns>");
+		Response.WriteLine("\t\tpublic DataTable SelectAllByDonvi_id(TNTCommon.DBManager objdbmanager, Guid _donvi_id)");
+		Response.WriteLine("\t\t{");
+		Response.WriteLine("\t\t\tSqlDataReader rdr = null;");
+		Response.WriteLine("\t\t\tDataTable dt = new DataTable();");
+		Response.WriteLine("\t\t\ttry");
+		Response.WriteLine("\t\t\t{");
+		Response.WriteLine("\t\t\t\tSqlCommand cmd = new SqlCommand(\"" + SourceTable.Name + "_ByDONVIID\", objdbmanager.Sqlconnection);");
+		Response.WriteLine("\t\t\t\t");
+		Response.WriteLine("\t\t\t\tcmd.CommandType = CommandType.StoredProcedure;");
+		Response.WriteLine("\t\t\t\tcmd.Parameters.Add(new SqlParameter(\"@donvi_id\", _donvi_id));");
+		Response.WriteLine("\t\t\t\t// execute the command");
+		Response.WriteLine("\t\t\t\trdr = cmd.ExecuteReader();");
+		Response.WriteLine("\t\t\t\tif (rdr.HasRows)");
+		Response.WriteLine("\t\t\t\t{ dt.Load(rdr); }");
+		Response.WriteLine("\t\t\t}");
+		Response.WriteLine("\t\t\tfinally");
+		Response.WriteLine("\t\t\t{");
+		Response.WriteLine("\t\t\tif (rdr != null) { rdr.Close(); }");
+		Response.WriteLine("\t\t\t}");
+		Response.WriteLine("\t\t\t\treturn dt;");
+		Response.WriteLine("\t\t\t}");
+		}	
+		
+public bool CheckCTD_ID()
+{
+	string s = "ctd_id";
+	bool b = false;
+	foreach(ColumnSchema objCol in SourceTable.Columns)
+	{
+		if (objCol.Name.ToLower() == s.ToLower() && !objCol.IsPrimaryKeyMember) return true;
+		}
+		return false;
+	}
+	
+public void GenSelectAllWithCTD_ID()	
+	{
+		if (!CheckCTD_ID()) return;
+		Response.WriteLine("\t\t///<summary>");
+		Response.WriteLine("\t\t///Select All");
+		Response.WriteLine("\t\t///</summary>");
+		Response.WriteLine("\t\t///<param name=\"_ctd_id\"></param>");
+		Response.WriteLine("\t\t///<returns></returns>");
+		Response.WriteLine("\t\tpublic DataTable SelectAllByCTD_ID(TNTCommon.DBManager objdbmanager, Guid _ctd_id)");
+		Response.WriteLine("\t\t{");
+		Response.WriteLine("\t\t\tSqlDataReader rdr = null;");
+		Response.WriteLine("\t\t\tDataTable dt = new DataTable();");
+		Response.WriteLine("\t\t\ttry");
+		Response.WriteLine("\t\t\t{");
+		Response.WriteLine("\t\t\t\tSqlCommand cmd = new SqlCommand(\"" + SourceTable.Name + "_ByCTD_ID\", objdbmanager.Sqlconnection);");
+		Response.WriteLine("\t\t\t\t");
+		Response.WriteLine("\t\t\t\tcmd.CommandType = CommandType.StoredProcedure;");
+		Response.WriteLine("\t\t\t\tcmd.Parameters.Add(new SqlParameter(\"@ctd_id\", _ctd_id));");
+		Response.WriteLine("\t\t\t\t// execute the command");
+		Response.WriteLine("\t\t\t\trdr = cmd.ExecuteReader();");
+		Response.WriteLine("\t\t\t\tif (rdr.HasRows)");
+		Response.WriteLine("\t\t\t\t{ dt.Load(rdr); }");
+		Response.WriteLine("\t\t\t}");
+		Response.WriteLine("\t\t\tfinally");
+		Response.WriteLine("\t\t\t{");
+		Response.WriteLine("\t\t\tif (rdr != null) { rdr.Close(); }");
+		Response.WriteLine("\t\t\t}");
+		Response.WriteLine("\t\t\t\treturn dt;");
+		Response.WriteLine("\t\t\t}");
+		}			
+
+///Sinh code cho lap ke hoach
+public void GenSelectWithLapkehoach_id()
+{
+	if (SourceTable.Name.IndexOf("giaidoan_") != 0 ) return;
+		Response.WriteLine("\t\t///<summary>");
+		Response.WriteLine("\t\t///Select Lap ke hoach ID");
+		Response.WriteLine("\t\t///</summary>");
+		Response.WriteLine("\t\t///<param name=\"_thongtin_id\"></param>");
+		Response.WriteLine("\t\t///<param name=\"_thu_tu\"></param>");
+		Response.WriteLine("\t\t///<param name=\"_thu_tu\"></param>");
+		Response.WriteLine("\t\t///<returns></returns>");
+		Response.WriteLine("\t\tpublic " + ReturnObjectName() + " SelectByThongtinID(Guid _thongtin_id, int _thu_tu, TNTCommon.DBManager objdbmanager)");
+		Response.WriteLine("\t\t{");
+		Response.WriteLine("\t\t\tSqlDataReader rdr = null;");
+		Response.WriteLine("\t\t\t" + ReturnObjectName() + " result = null;");
+		Response.WriteLine("\t\t\ttry");
+		Response.WriteLine("\t\t\t{");
+		Response.WriteLine("\t\t\t\tSqlCommand cmd = new SqlCommand(\"" + SourceTable.Name + "_SelectByThongtinID\", objdbmanager.Sqlconnection);");
+		Response.WriteLine("\t\t\t\t");
+		Response.WriteLine("\t\t\t\tcmd.CommandType = CommandType.StoredProcedure;");
+		Response.WriteLine("\t\t\t\tcmd.Parameters.Add(new SqlParameter(\"@thongtin_id\", _thongtin_id));");
+		Response.WriteLine("\t\t\t\tcmd.Parameters.Add(new SqlParameter(\"@thu_tu\", _thu_tu));");
+		Response.WriteLine("\t\t\t\t// execute the command");
+		Response.WriteLine("\t\t\t\trdr = cmd.ExecuteReader();");
+		Response.WriteLine("\t\t\t\tresult = ReaderToObject(rdr);");
+		Response.WriteLine("\t\t\t}");
+		Response.WriteLine("\t\t\tfinally");
+		Response.WriteLine("\t\t\t{");
+		Response.WriteLine("\t\t\tif (rdr != null) { rdr.Close(); }");
+		Response.WriteLine("\t\t\t}");
+		Response.WriteLine("\t\t\t\treturn result;");
+		Response.WriteLine("\t\t\t}");
+}
+/*
+public string GenNameSpace()
+{
+	string s = SourceTable.Name;
+	if (s.IndexOf("ht_") == 0) return ".Hethong";
+	if (s.IndexOf("sp_") == 0) return ".Sanpham";
+	if (s.IndexOf("cv_") == 0) return ".Congviec";
+	if (s.IndexOf("qt_") == 0) return ".Quytrinh";
+	//if (s.IndexOf("dm_") == 0) return ".Dictionary";
+	//if (s.IndexOf("ct") == 0) return ".Accouting";
+	//if (s.IndexOf("giaidoan") == 0) return ".Invitation";
+	//if (s.IndexOf("S_") == 0 || s.IndexOf("s_") == 0) return ".Admin";
+	return "";
+	}
+*/	
+</script>

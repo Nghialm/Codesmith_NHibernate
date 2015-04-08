@@ -1,0 +1,60 @@
+<%-- 
+Name: Nghialm
+Author: 
+Description: 
+--%>
+<%-- Context --%>
+<%@ CodeTemplate Language="C#" TargetLanguage="HTML" Src="Function.cs" Inherits="Function" Description="Generates a set of HTML-based database documentation." %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema"
+	Description="Table that the stored procedures should be based on." %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%-- Assembly References --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%-- Namespace Imports --%>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+
+using DoanhNghiepEntities<%=GenNameSpace(SourceTable.Name)%>;
+using DoanhNghiepDAL_Base<%=GenNameSpace(SourceTable.Name)%>;
+
+namespace DoanhNghiepDAL<%=GenNameSpace(SourceTable.Name)%> 
+{
+    public class DAL_<%= ReturnObjectClass() %> : DAL_<%= ReturnObjectClass() %>_Base
+	{
+		#region Basic function
+		
+		#endregion
+	}
+}
+<script runat="template">
+public string ReturnObjectClass()
+{
+	string stable = SourceTable.Name.ToString();
+	return stable;
+	}
+	
+public string GenNameSpace()
+{
+	string s = SourceTable.Name;
+	if (s.IndexOf("ht_") == 0) return ".Hethong";
+	if (s.IndexOf("sp_") == 0) return ".Sanpham";
+	if (s.IndexOf("cv_") == 0) return ".Congviec";
+	if (s.IndexOf("qt_") == 0) return ".Quytrinh";
+	//if (s.IndexOf("dm") == 0) return ".Dictionary";
+	//if (s.IndexOf("ct") == 0) return ".Accouting";
+	//if (s.IndexOf("giaidoan") == 0) return ".Invitation";
+	//if (s.IndexOf("S_") == 0 || s.IndexOf("s_") == 0) return ".Admin";
+	return "";
+	}
+</script>

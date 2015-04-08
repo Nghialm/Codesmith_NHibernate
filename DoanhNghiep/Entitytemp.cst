@@ -1,0 +1,165 @@
+<%-- 
+Name: Nghialm
+Author: 
+Description: 
+--%>
+<%-- Context --%>
+<%@ CodeTemplate Language="C#" TargetLanguage="HTML" Src="Function.cs" Inherits="Function" Description="Generates a set of HTML-based database documentation." %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema"
+	Description="Table that the stored procedures should be based on." %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%-- Assembly References --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Assembly Name="System.Data" %>
+<%-- Namespace Imports --%>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
+<script runat="template">
+
+</script>
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DoanhNghiepEntities<%=GenNameSpace(SourceTable.Name)%>
+{
+	public class <%= ReturnObjectName() %>Info
+	{
+	#region varible 
+	<% GenerateColumns(); %>
+	#endregion
+	
+	/// <summary>
+	/// Summary description for <%= ReturnObjectName() %>
+	/// </summary>
+	<% GenProperties(); %>
+
+	/// <summary>
+	/// Summary description for <%= ReturnObjectName() %>
+	/// </summary>
+    public <%= ReturnObjectName() %>Info()
+	{
+		//
+		// TODO: Add constructor logic here
+		//
+	}
+}
+}
+<script runat="template">
+// My methods here.
+private Regex excludedColumnRegex = null;
+
+public string SampleMethod()
+{
+	return "Method output.";
+}
+
+public void GenerateColumns()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	//ColumnSchemaCollection filteredColumns = FilterExcludedColumns(columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		Response.WriteLine("\tprivate " + ReturnValueType(GeneColumns[i]) + " _" + GeneColumns[i].Name + ReturnValueDefault(GeneColumns[i]) +";");
+	}
+}
+
+public void GenProperties()
+{
+	ColumnSchemaCollection GeneColumns =  new ColumnSchemaCollection(SourceTable.Columns);
+	for (int i = 0; i < GeneColumns.Count; i++)
+	{
+		Response.WriteLine("\tpublic " + ReturnValueType(GeneColumns[i]) + " " + GeneColumns[i].Name.Trim('_', ' '));
+		Response.WriteLine("\t{");
+		Response.WriteLine("\t\tget{return " + "_" + GeneColumns[i].Name +";}");
+		Response.WriteLine("\t\tset{ _" + GeneColumns[i].Name + "= value;}");
+		Response.WriteLine("\t}");
+	}
+	Response.WriteLine("");
+}	
+
+//Return value type
+public string ReturnValueType(ColumnSchema GenColumns)
+{
+	string stemp = "";
+	switch (GenColumns.DataType)
+	{
+		case System.Data.DbType.Guid:
+			return "Guid";
+		case System.Data.DbType.AnsiStringFixedLength:
+			return "String";
+		case System.Data.DbType.AnsiString:
+			return "String";
+		case System.Data.DbType.StringFixedLength:
+			return "String";
+		default:
+			stemp = "" + GenColumns.DataType; 
+			return stemp;
+	}
+	}
+	
+public string ReturnValueDefault(ColumnSchema GenColumns)
+{
+	string stemp = "";
+	switch (GenColumns.DataType)
+	{
+		case System.Data.DbType.Guid:
+			return "= new Guid()";
+		case System.Data.DbType.AnsiStringFixedLength:
+			return "= String.Empty";
+		case System.Data.DbType.AnsiString:
+			return "= String.Empty";
+		case System.Data.DbType.StringFixedLength:
+			return "= String.Empty";
+		case System.Data.DbType.Decimal:
+			return "= 0";
+		case System.Data.DbType.Int16:
+			return "= 0";
+		case System.Data.DbType.Int32:
+			return "= 0";
+		case System.Data.DbType.Int64:
+			return "= 0";
+		case System.Data.DbType.Currency:
+			return "= 0";	
+		case System.Data.DbType.Date:
+			return "= DateTime.Now";
+		case System.Data.DbType.DateTime:
+			return "= DateTime.Now";
+		case System.Data.DbType.DateTime2:
+			return "= DateTime.Now"	;
+		case System.Data.DbType.Boolean:
+			return "= false";
+		case System.Data.DbType.Double:
+			return "= 0";
+		default:
+			stemp = "= String.Empty"; 
+			return stemp;
+	}
+	}	
+	
+public string ReturnObjectName()
+{
+	string stable = SourceTable.Name.ToString();
+	return stable;
+	}
+	
+public string GenNameSpace()
+{
+	string s = SourceTable.Name;
+	if (s.IndexOf("ht_") == 0) return ".Hethong";
+	if (s.IndexOf("sp_") == 0) return ".Sanpham";
+	if (s.IndexOf("cv_") == 0) return ".Congviec";
+	if (s.IndexOf("qt_") == 0) return ".Quytrinh";
+	//if (s.IndexOf("dm") == 0) return ".Dictionary";
+	//if (s.IndexOf("ct") == 0) return ".Accouting";
+	//if (s.IndexOf("giaidoan") == 0) return ".Invitation";
+	//if (s.IndexOf("S_") == 0 || s.IndexOf("s_") == 0) return ".Admin";
+	return "";
+	}	
+</script>

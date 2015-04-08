@@ -1,0 +1,387 @@
+<%-- 
+Name: Nghialm
+Author: 
+Description: 
+--%>
+<%-- Context --%>
+<%@ CodeTemplate Language="C#" TargetLanguage="HTML" Src="Function.cs" Inherits="Function" Description="Generates a set of HTML-based database documentation." %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema"
+	Description="Table that the stored procedures should be based on." %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%-- Assembly References --%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="CodeSmith.BaseTemplates" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Assembly Name="System.Data" %>
+<%-- Namespace Imports --%>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.BaseTemplates" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient;
+
+using DoanhNghiepDAL<%=GenNameSpace(SourceTable.Name)%>;
+using DoanhNghiepEntities<%=GenNameSpace(SourceTable.Name)%>;
+
+namespace DoanhNghiepBLL<%=GenNameSpace(SourceTable.Name)%>
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public class BLL_<%=ReturnObjectClass()%> : BLL_base
+    {
+		#region Basic function
+        /// <summary>
+        /// Select All
+        /// </summary>
+        /// <returns></returns>
+        public DataTable SelectAll()
+        {
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+            DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+            return objDAL<%=ReturnObjectClass()%>.SelectAll(objdbmanager);
+        }
+
+        /// <summary>
+        /// Select one Record
+        /// </summary>
+        /// <param name="_<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>"></param>
+        /// <returns></returns>
+        public <%= ReturnObjectName()%> Select(<%ReturnType1(SourceTable.PrimaryKey.MemberColumns[0].Column); %> _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>)
+        {
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+            DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+            return objDAL<%=ReturnObjectClass()%>.Select(_<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>, objdbmanager);
+        }
+
+        /// <summary>
+        /// Delete one record by <%=SourceTable.PrimaryKey.MemberColumns[0].Name %>
+        /// </summary>
+        /// <param name="_<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>"></param>
+        /// <returns></returns>
+        public Boolean Delete(<%ReturnType1(SourceTable.PrimaryKey.MemberColumns[0].Column); %> _<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>)
+        {
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+			Boolean btemp = false;
+			try
+			{
+				objdbmanager.BeginTransaction();
+				DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+				btemp = objDAL<%=ReturnObjectClass()%>.Delete(_<%=SourceTable.PrimaryKey.MemberColumns[0].Name %>, objdbmanager);
+				objdbmanager.CommitTransaction();
+				btemp = true;
+			}
+			catch (SqlException sqlEx)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(sqlEx);
+                throw cusex;
+            }
+            catch (Exception ex)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(ex);
+                throw cusex;
+            }
+			finally
+            {
+				objdbmanager.Close();
+            }
+			return btemp;
+        }
+
+        /// <summary>
+        /// Insert one record
+        /// </summary>
+        /// <param name="objRecord"></param>
+        /// <returns></returns>
+        public Boolean Insert(<%= ReturnObjectName()%> objRecord)
+        {
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+			Boolean btemp = false;
+			try
+			{
+				objdbmanager.BeginTransaction();
+				DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+				btemp = objDAL<%=ReturnObjectClass()%>.Insert(objRecord, objdbmanager);
+				objdbmanager.CommitTransaction();
+				btemp = true;
+			}
+			catch (SqlException sqlEx)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(sqlEx);
+                throw cusex;
+            }
+            catch (Exception ex)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(ex);
+                throw cusex;
+            }
+			finally
+            {
+				objdbmanager.Close();
+            }
+			return btemp;
+        }
+
+        /// <summary>
+        /// Update one record
+        /// </summary>
+        /// <param name="objRecord"></param>
+        /// <returns></returns>
+        public Boolean Update(<%= ReturnObjectName()%> objRecord)
+        {
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+			Boolean btemp = false;
+			try
+			{
+				objdbmanager.BeginTransaction();
+				btemp = true;
+				DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+				btemp = objDAL<%=ReturnObjectClass()%>.Update(objRecord, objdbmanager);
+				objdbmanager.CommitTransaction();
+				btemp = true;
+			}
+            catch (SqlException sqlEx)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(sqlEx);
+                throw cusex;
+            }
+            catch (Exception ex)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(ex);
+                throw cusex;
+            }
+			finally
+            {
+				objdbmanager.Close();
+            }
+			return btemp;
+        }
+		
+		<% if (CheckDONVIID()) { %>
+		///<summary>
+		///Select All
+		///</summary>
+		///<param name="_donvi_id"></param>
+		///<returns></returns>
+		public DataTable SelectAllByDonvi_id(Guid _donvi_id)
+		{
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+			DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+			return objDAL<%=ReturnObjectClass()%>.SelectAllByDonvi_id(objdbmanager, _donvi_id);
+		}
+		
+		///<summary>
+        ///Select All
+        ///</summary>
+        ///<param name="_bqlda_id"></param>
+        ///<returns></returns>
+        public List<<%= ReturnObjectName()%>> SelectByDonvi_id(Guid _donvi_id)
+        {
+            TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+            DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+            return objDAL<%=ReturnObjectClass()%>.SelectByDonvi_id(objdbmanager, _donvi_id);
+        }
+		<% } %>
+		
+		<% if (CheckCTD_ID()) {%>
+		///<summary>
+		///Select All
+		///</summary>
+		///<param name="_ctd_id"></param>
+		///<returns></returns>
+		public DataTable SelectAllByCtd_id(Guid _ctd_id)
+		{
+				TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+				DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+				return objDAL<%=ReturnObjectClass()%>.SelectAllByCTD_ID(objdbmanager, _ctd_id);
+		}
+		
+		///<summary>
+		///Select All
+		///</summary>
+		///<param name="_ctd_id"></param>
+		///<returns></returns>
+		public  List<<%= ReturnObjectName()%>> SelectByCtd_id(Guid _ctd_id)
+		{
+				TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+				DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+				return objDAL<%=ReturnObjectClass()%>.SelectByCTD_ID(objdbmanager, _ctd_id);
+		}
+		
+		///<summary>
+		///Xoa ban ghi theo ctd_id
+		///</summary>
+		///<param name="_ctd_id"></param>
+		///<returns></returns>
+		public Boolean DeleteByCTD_ID(Guid _ctd_id)
+        {
+			TNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();
+			Boolean btemp = false;
+			try
+			{
+				objdbmanager.BeginTransaction();
+				DAL_<%=ReturnObjectClass()%> objDAL<%=ReturnObjectClass()%> = new DAL_<%=ReturnObjectClass()%>();
+				btemp = objDAL<%=ReturnObjectClass()%>.DeleteByCTD_ID(objdbmanager, _ctd_id);
+				objdbmanager.CommitTransaction();
+				btemp = true;
+			}
+			catch (SqlException sqlEx)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(sqlEx);
+                throw cusex;
+            }
+            catch (Exception ex)
+            {
+                objdbmanager.RollbackTransaction();
+				objdbmanager.Close();
+                btemp = false;
+                TNTCommon.ExceptionHelper cusex = new TNTCommon.ExceptionHelper(ex);
+                throw cusex;
+            }
+			finally
+            {
+				objdbmanager.Close();
+            }
+			return btemp;
+        }
+		<%}%>
+		#endregion
+		
+    }
+}
+
+<script runat="template">
+// My methods here.
+public string ReturnObjectClass()
+{
+	string stable = SourceTable.Name.ToString();
+	return stable;
+	}
+
+public string ReturnObjectName()
+{
+	string stable = SourceTable.Name.ToString();
+	return stable + "Info";
+	}
+	
+public void ReturnType1(ColumnSchema tempCol1)
+{
+	string s = "";
+	switch (tempCol1.DataType)
+	{
+		case DbType.Guid:
+			s = "Guid";
+			break;
+		case DbType.Int16:
+			s = "Int16";			
+			break;
+		case DbType.Int32:
+			s = "Int32";
+			break;
+		case DbType.Int64:
+			s = "Int64";
+			break;
+		default:
+			s = "String";
+			break;
+		}
+		Response.Write(s);
+	}	
+	
+public bool CheckDONVIID()
+{
+	string s = "donvi_id";
+	foreach(ColumnSchema objCol in SourceTable.Columns)
+	{
+		if (objCol.Name.ToLower() == s.ToLower()) return true;
+		}
+		return false;
+	}	
+	
+public bool CheckCTD_ID()
+{
+	string s = "ctd_id";
+	bool b = false;
+	foreach(ColumnSchema objCol in SourceTable.Columns)
+	{
+		if (objCol.Name.ToLower() == s.ToLower() && !objCol.IsPrimaryKeyMember) return true;
+		}
+		return false;
+	}
+	
+public void GenSelectAllWithCTD_ID()	
+{
+	if (!CheckCTD_ID()) return;
+	Response.WriteLine("\t\t///<summary>");
+	Response.WriteLine("\t\t///Select All");
+	Response.WriteLine("\t\t///</summary>");
+	Response.WriteLine("\t\t///<param name=\"_ctd_id\"></param>");
+	Response.WriteLine("\t\t///<returns></returns>");
+	Response.WriteLine("\t\tpublic DataTable SelectAllByCtd_id(Guid _ctd_id)");
+	Response.WriteLine("\t\t{");
+	Response.WriteLine("\t\t\t\tTNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();");
+	Response.WriteLine("\t\t\t\tDAL_" + ReturnObjectClass() + " objDAL" + ReturnObjectClass()+ " = new DAL_" + ReturnObjectClass() + "();");
+	Response.WriteLine("\t\t\t\treturn objDAL" + ReturnObjectClass() + ".SelectAllByCTD_ID(objdbmanager, _ctd_id);");
+	Response.WriteLine("\t\t}");
+	}	
+
+public void GenSelectWithLapkehoach_id()
+{
+	if (SourceTable.Name.IndexOf("giaidoan_") != 0 ) return;
+		Response.WriteLine("\t\t///<summary>");
+		Response.WriteLine("\t\t///Select All");
+		Response.WriteLine("\t\t///</summary>");
+		Response.WriteLine("\t\t///<param name=\"_ctd_id\"></param>");
+		Response.WriteLine("\t\t///<returns></returns>");
+		Response.WriteLine("\t\tpublic " + ReturnObjectName() + " SelectByThongtinID(Guid _thongtin_id, int _thu_tu)");
+		Response.WriteLine("\t\t{");
+		Response.WriteLine("\t\t\t\tTNTCommon.DBManager objdbmanager = new TNTCommon.DBManager();");
+		Response.WriteLine("\t\t\t\tDAL_" + ReturnObjectClass() + " objDAL" + ReturnObjectClass()+ " = new DAL_" + ReturnObjectClass() + "();");
+		Response.WriteLine("\t\t\t\treturn objDAL" + ReturnObjectClass() + ".SelectByThongtinID(_thongtin_id,_thu_tu, objdbmanager);");
+		Response.WriteLine("\t\t}");
+	}
+	
+	/*
+public string GenNameSpace()
+{
+	string s = SourceTable.Name;
+	if (s.IndexOf("ht_") == 0) return ".Hethong";
+	if (s.IndexOf("sp_") == 0) return ".Sanpham";
+	if (s.IndexOf("dm") == 0) return ".Dictionary";
+	if (s.IndexOf("cv_") == 0) return ".Congviec";
+	if (s.IndexOf("qt_") == 0) return ".Quytrinh";
+	//if (s.IndexOf("ct") == 0) return ".Accouting";
+	//if (s.IndexOf("giaidoan") == 0) return ".Invitation";
+	//if (s.IndexOf("S_") == 0 || s.IndexOf("s_") == 0) return ".Admin";
+	return "";
+	}
+	*/
+</script>

@@ -1,0 +1,71 @@
+﻿<%-- 
+Name:
+Author: 
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="" Inherits="" Debug="True" Description="Template description here." %>
+<%@ Property Name="SampleStringProperty" Type="System.String" Default="SomeValue" Optional="True" Category="Strings" Description="This is a sample string property." %>
+<%@ Property Name="SampleBooleanProperty" Type="System.Boolean" Default="True" Optional="False" Category="Booleans" Description="This is a sample boolean property." %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Property Name="Database" Type="SchemaExplorer.DatabaseSchema" Default="" Optional="False" %>
+<%@ Assembly Name="CodeSmith.CustomProperties" %>
+<%@ Import Namespace="CodeSmith.CustomProperties" %>
+<%@ Register Name="objBBL" Template="bbltemp.cst" %>
+<%@ Register Name="objDAL" Template="daltemp.cst" %>
+<%@ Register Name="objDALimp" Template="dal_imp_temp.cst" %>
+<%@ Register Name="objEntity" Template="Entitytemp.cst" %>
+<%@ Register Name="objsp" Template="StoredProcedures.cst" %>
+<%@ Import Namespace="System.IO" %>
+<%@ CodeTemplate Language="C#" TargetLanguage="HTML" Src="Function.cs" Inherits="Function" Description="Generates a set of HTML-based database documentation." %>
+<%
+foreach(SchemaExplorer.TableSchema objecttable in Database.Tables)
+{
+	if (objecttable.Name.IndexOf("dm_chitieu") == 0)
+	{
+		objBBL objbbl = new objBBL();
+		objbbl.SetProperty("SourceTable",objecttable);
+		string bllfileName = _dic + "\\BLL\\BLL_" + ReturnObjectClass(objecttable.Name.ToString()) + ".cs";
+		StreamWriter bllfileWriter = new StreamWriter(bllfileName, false);
+		objbbl.Render(bllfileWriter);
+		bllfileWriter.Close();
+		
+		objDAL objdal = new objDAL();
+		objdal.SetProperty("SourceTable",objecttable);
+		string dalfileName = _dic + "\\DAL_Base\\DAL_" + ReturnObjectClass(objecttable.Name.ToString()) + "_Base.cs";
+		StreamWriter dalfileWriter = new StreamWriter(dalfileName, false);
+		objdal.Render(dalfileWriter);
+		dalfileWriter.Close();
+		
+		objDALimp objdalimp = new objDALimp();
+		objdalimp.SetProperty("SourceTable",objecttable);
+		string dalfileNameimp = _dic + "\\DAL\\DAL_" + ReturnObjectClass(objecttable.Name.ToString()) + ".cs";
+		StreamWriter dalfileWriterimp = new StreamWriter(dalfileNameimp, false);
+		objdalimp.Render(dalfileWriterimp);
+		dalfileWriterimp.Close();
+		
+		objEntity objentity = new objEntity();
+		objentity.SetProperty("SourceTable",objecttable);
+		string entityfileName = _dic + "\\Entity\\" + ReturnObjectClass(objecttable.Name.ToString()) + "Info.cs";
+		StreamWriter entityfileWriter = new StreamWriter(entityfileName, false);
+		objentity.Render(entityfileWriter);
+		entityfileWriter.Close();
+		
+		objsp objspro = new objsp();
+		objspro.SetProperty("SourceTable",objecttable);
+		string spfileName = _dic + "\\SQL\\" + objecttable.Name.ToString() + ".sql";
+		StreamWriter spfileWriter = new StreamWriter(spfileName, false);
+		objspro.Render(spfileWriter);
+		spfileWriter.Close();
+	}
+	}
+	
+
+%>
+<script runat="template">
+public string ReturnObjectClass(string sobject)
+{
+	string stable = sobject;
+	return stable;
+	}	
+</script>
