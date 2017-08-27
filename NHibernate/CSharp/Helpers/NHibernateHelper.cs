@@ -169,7 +169,8 @@ public class NHibernateHelper : CodeTemplate
 		}
 
 		//return StringUtil.ToSingular(StringUtil.ToPascalCase(className));
-		return GetCustomNameColumn(className);
+		//return GetCustomNameColumn(className);
+        return table.Name;
 	}
 	protected string tablePrefix = String.Empty;
 	
@@ -189,6 +190,7 @@ public class NHibernateHelper : CodeTemplate
         String s = columnname;
         String[] s_1;
         s_1= s.Split('_');
+        if (!s.Contains("_"))
         for (int i = 0; i < s_1.Length; i++ )
         {
             String s_First = "";
@@ -197,6 +199,9 @@ public class NHibernateHelper : CodeTemplate
             s_Another = s_1[i].ToLower();
             SName += s_First + s_Another.Remove(0, 1);
             }
+        else
+            SName = columnname;
+            
         return SName;
 		}
 	

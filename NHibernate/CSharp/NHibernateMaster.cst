@@ -67,7 +67,7 @@ Description: Generates a complete set of Maps, Business Objects, Manager Objects
 <script runat="template">
 public string CustomGetFolder(string SubFolder)
 {
-	string MainFolder = @"E:\CodeGen\Ketoan";
+	string MainFolder = @"D:\CodeGen\OpenMRS";
 	return MainFolder + @"\" + SubFolder + @"\";
 	}
 
@@ -88,7 +88,7 @@ public override void Render(TextWriter writer)
 				RenderIDAO(table);
 				RenderService(table);
 				RenderNhibDao(table);
-				RenderManagerObjects(table);
+//				RenderManagerObjects(table);
 				
 				//Render all class 4 VBMS Project
 				Render4KTY(table);
